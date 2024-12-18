@@ -49,11 +49,11 @@ const Login = () => {
 
 	const debouncedUsernameChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
 		setUsername(e.target.value)
-	}, 300) // Adjust debounce delay as needed
+	}, 100) // Adjust debounce delay as needed
 
 	const debouncedPasswordChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(e.target.value)
-	}, 300)
+	}, 100)
 
 	return (
 		<div className='w-[30%] h-screen flex justify-center items-center p-4'>
