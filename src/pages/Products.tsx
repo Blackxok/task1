@@ -60,7 +60,7 @@ const Products = () => {
 	}
 
 	const addProduct = () => {
-		if (!newProductName || !newProductImage) {
+		if (products.length > 0 && (!newProductName || !newProductImage)) {
 			alert('Product name and image are required')
 			return
 		}
@@ -81,7 +81,7 @@ const Products = () => {
 	}
 
 	const saveEditedProduct = () => {
-		if (!editedProductName || !editedProductImage) {
+		if (products.length > 0 && (!editedProductName || !editedProductImage)) {
 			alert('Edited product name and image are required')
 			return
 		}
@@ -116,7 +116,7 @@ const Products = () => {
 			{isAddOpen && (
 				<div
 					ref={addProductRef}
-					className='fixed top-16 right-4 w-80 p-4 bg-gray-800 text-white rounded-lg shadow-lg'
+					className='fixed top-16 right-4 w-80 p-4 bg-gray-700 text-white rounded-lg shadow-lg'
 				>
 					<h3 className='text-lg font-semibold'>Add New Product</h3>
 					<Input
@@ -176,7 +176,7 @@ const Products = () => {
 			{isEditOpen && (
 				<div
 					ref={editProductRef}
-					className='fixed top-16 right-4 w-80 p-4 bg-gray-800 rounded-lg shadow-lg'
+					className='fixed top-16 right-4 w-80 p-4 bg-gray-700 rounded-lg shadow-lg'
 				>
 					<h3 className='text-lg font-semibold'>Edit Product</h3>
 					<Input
