@@ -1,27 +1,59 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
+
+// Debounce function to optimize input handling
+const useDebounce = (callback: Function, delay: number) => {
+	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null)
+
+	const debouncedCallback = useCallback(
+		(...args: any) => {
+			if (timer) clearTimeout(timer)
+			const newTimer = setTimeout(() => {
+				callback(...args)
+			}, delay)
+			setTimer(newTimer)
+		},
+		[callback, delay, timer],
+	)
+
+	return debouncedCallback
+}
 
 const Login = () => {
 	const navigate = useNavigate()
 	const [username, setUsername] = useState<string>('')
 	const [password, setPassword] = useState<string>('')
 
-	const handleLogin = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (username === 'admin' && password === '1234') {
-			navigate('/products')
-		} else {
-			alert("Login yoki parol noto'g'ri")
-		}
-	}
+	const handleLogin = useCallback(
+		(e: React.FormEvent) => {
+			e.preventDefault()
+			if (username === 'admin' && password === '1234') {
+				navigate('/products')
+			} else {
+				alert("Login yoki parol noto'g'ri")
+			}
+		},
+		[username, password, navigate],
+	)
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			handleLogin(e)
-		}
-	}
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent) => {
+			if (e.key === 'Enter') {
+				handleLogin(e)
+			}
+		},
+		[handleLogin],
+	)
+
+	const debouncedUsernameChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
+		setUsername(e.target.value)
+	}, 300) // Adjust debounce delay as needed
+
+	const debouncedPasswordChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
+		setPassword(e.target.value)
+	}, 300)
 
 	return (
 		<div className='w-[30%] h-screen flex justify-center items-center p-4'>
@@ -37,7 +69,7 @@ const Login = () => {
 							id='username'
 							type='text'
 							value={username}
-							onChange={e => setUsername(e.target.value)}
+							onChange={debouncedUsernameChange}
 							onKeyDown={handleKeyDown}
 							className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
 							placeholder='Enter your username'
@@ -52,7 +84,7 @@ const Login = () => {
 							id='password'
 							type='password'
 							value={password}
-							onChange={e => setPassword(e.target.value)}
+							onChange={debouncedPasswordChange}
 							onKeyDown={handleKeyDown}
 							className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
 							placeholder='Enter your password'
