@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -17,6 +17,13 @@ const useDebounce = (callback: Function, delay: number) => {
 		},
 		[callback, delay, timer],
 	)
+
+	// Cleanup the timer on component unmount or changes to the timer
+	useEffect(() => {
+		return () => {
+			if (timer) clearTimeout(timer)
+		}
+	}, [timer])
 
 	return debouncedCallback
 }
@@ -49,7 +56,7 @@ const Login = () => {
 
 	const debouncedUsernameChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
 		setUsername(e.target.value)
-	}, 100) // Adjust debounce delay as needed
+	}, 100)
 
 	const debouncedPasswordChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(e.target.value)
