@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client'
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import './index.css'
 import App from './pages/Login'
 import Products from './pages/Products'
@@ -11,6 +11,7 @@ root.render(
 		<Routes>
 			<Route path='/' element={<App />} />
 			<Route path='/products' element={<Products />} />
+			<Route path='*' element={<Navigate to='/' />} />
 		</Routes>
 	</Router>,
 )
