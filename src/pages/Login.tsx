@@ -13,7 +13,7 @@ const Login = () => {
 	const handleLogin = useCallback(
 		(e: React.FormEvent) => {
 			e.preventDefault()
-			if (username === 'admin' && password === '1234') {
+			if (username === 'admin' && password === '1') {
 				navigate('/products')
 			} else {
 				alert("Login yoki parol noto'g'ri")
