@@ -1,37 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react' // Add the eye icons
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-
-// Debounce function to optimize input handling
-const useDebounce = (callback: Function, delay: number) => {
-	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null)
-
-	const debouncedCallback = useCallback(
-		(...args: any) => {
-			if (timer) clearTimeout(timer)
-			const newTimer = setTimeout(() => {
-				callback(...args)
-			}, delay)
-			setTimer(newTimer)
-		},
-		[callback, delay, timer],
-	)
-
-	// Cleanup the timer on component unmount or changes to the timer
-	useEffect(() => {
-		return () => {
-			if (timer) clearTimeout(timer)
-		}
-	}, [timer])
-
-	return debouncedCallback
-}
 
 const Login = () => {
 	const navigate = useNavigate()
 	const [username, setUsername] = useState<string>('')
 	const [password, setPassword] = useState<string>('')
+	const [showPassword, setShowPassword] = useState<boolean>(false) // State for password visibility
 
 	const handleLogin = useCallback(
 		(e: React.FormEvent) => {
@@ -54,18 +31,23 @@ const Login = () => {
 		[handleLogin],
 	)
 
-	const debouncedUsernameChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUsername(e.target.value)
-	}, 100)
+	}
 
-	const debouncedPasswordChange = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
+	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(e.target.value)
-	}, 100)
+	}
+
+	// Toggle password visibility
+	const togglePasswordVisibility = () => {
+		setShowPassword(!showPassword)
+	}
 
 	return (
-		<div className='w-[30%] h-screen flex justify-center items-center p-4'>
-			<div className='p-8 border rounded-lg shadow-md w-full'>
-				<h2 className='text-center text-3xl'>Login</h2>
+		<div className='w-full h-screen flex justify-center items-center p-4'>
+			<div className='w-full sm:w-[400px] p-8 border rounded-lg shadow-md'>
+				<h2 className='text-center text-3xl mb-4'>Login</h2>
 
 				<form onSubmit={handleLogin} className='space-y-4'>
 					<div className='mb-4'>
@@ -76,26 +58,36 @@ const Login = () => {
 							id='username'
 							type='text'
 							value={username}
-							onChange={debouncedUsernameChange}
+							onChange={handleUsernameChange}
 							onKeyDown={handleKeyDown}
 							className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
 							placeholder='Enter your username'
 						/>
 					</div>
 
-					<div className='mb-6'>
+					<div className='mb-6 relative'>
 						<label htmlFor='password' className='block text-sm font-medium text-gray-700 mb-2'>
 							Password
 						</label>
-						<Input
-							id='password'
-							type='password'
-							value={password}
-							onChange={debouncedPasswordChange}
-							onKeyDown={handleKeyDown}
-							className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-							placeholder='Enter your password'
-						/>
+						<div className='password-input flex items-center justify-center'>
+							<Input
+								id='password'
+								type={showPassword ? 'text' : 'password'} // Conditionally change the input type
+								value={password}
+								onChange={handlePasswordChange}
+								onKeyDown={handleKeyDown}
+								className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+								placeholder='Enter your password'
+							/>
+							{/* Eye Icon for toggling password visibility */}
+							<button
+								type='button'
+								onClick={togglePasswordVisibility}
+								className='absolute right-[10px] text-gray-300 p-0 bg-transparent outline-none focus:outline-none focus:ring-0 hover:outline-none hover:border-none'
+							>
+								{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+							</button>
+						</div>
 					</div>
 
 					<Button
