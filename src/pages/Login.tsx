@@ -11,12 +11,27 @@ const Login = () => {
 	const [showPassword, setShowPassword] = useState<boolean>(false) // State for password visibility
 
 	const handleLogin = useCallback(
-		(e: React.FormEvent) => {
+		async (e: React.FormEvent) => {
 			e.preventDefault()
-			if (username === 'admin' && password === '1') {
-				navigate('/products')
-			} else {
-				alert("Login yoki parol noto'g'ri")
+
+			try {
+				const response = await fetch('https://crudproduct.pythonanywhere.com/api/login/', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username, password }),
+				})
+				if (response.ok) {
+					const data = await response.json()
+					const accessToken = data.access
+					localStorage.setItem('accessToken', accessToken)
+					localStorage.setItem('username', username)
+					navigate('/products')
+				} else {
+					alert("Login yoki parol noto'g'ri")
+				}
+			} catch (error) {
+				console.error('Xatolik yuz berdi:', error)
+				alert("Server bilan bog'lanishda xatolik yuz berdi")
 			}
 		},
 		[username, password, navigate],
@@ -25,6 +40,7 @@ const Login = () => {
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
 			if (e.key === 'Enter') {
+				e.preventDefault()
 				handleLogin(e)
 			}
 		},
