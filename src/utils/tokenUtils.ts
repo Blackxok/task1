@@ -1,5 +1,4 @@
 import { jwtDecode } from 'jwt-decode'
-// utils/tokenUtils.ts
 
 export const getAccessToken = (): string | null => {
 	return localStorage.getItem('accessToken')

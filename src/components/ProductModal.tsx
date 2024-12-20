@@ -53,10 +53,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
 	if (!isOpen) return null
 
-	// Handle save button
 	const handleSave = async () => {
 		if (isEdit) {
-			// Update existing product if in edit mode
 			saveProduct(productData)
 		} else {
 			//  POST
@@ -87,7 +85,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
 				const newProduct = await response.json()
 				saveProduct(newProduct)
-				onClose() // Close the modal after adding the product
+				onClose()
 			} catch (error) {
 				console.error('Error adding product:', error)
 			}

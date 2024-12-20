@@ -14,7 +14,6 @@ const Products = () => {
 	const [currentProduct, setCurrentProduct] = useState<tProduct | null>(null)
 	const [loading, setLoading] = useState(false)
 	const loadingBar = useRef<any>(null)
-
 	const username: string = localStorage.getItem('username') || 'Guest'
 
 	useEffect(() => {
@@ -30,19 +29,16 @@ const Products = () => {
 		setCurrentProduct(product)
 		setIsEditOpen(true)
 	}
-
 	//  GET
 	const fetchProducts = async () => {
 		setLoading(true)
 		try {
-			// Get a valid access token
 			const validAccessToken = await getValidAccessToken()
 			if (!validAccessToken) {
 				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
 				setLoading(false)
 				return
 			}
-			// Fetch so'rovini yuborish
 			const response = await fetch('https://crudproduct.pythonanywhere.com/api/products/', {
 				method: 'GET',
 				headers: {
@@ -50,7 +46,6 @@ const Products = () => {
 					Authorization: `Bearer ${validAccessToken}`,
 				},
 			})
-			// Javobni tekshirish
 			if (!response.ok) throw new Error('Network response was not ok')
 
 			const data = await response.json()
@@ -67,9 +62,8 @@ const Products = () => {
 	}
 	//  PUT
 	const saveEditedProduct = async (updatedProduct: tProduct) => {
-		setLoading(true) // Start loading when saving the edited product
+		setLoading(true)
 		try {
-			// Get a valid access token
 			const validAccessToken = await getValidAccessToken()
 			if (!validAccessToken) {
 				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
@@ -100,15 +94,13 @@ const Products = () => {
 		} catch (error) {
 			console.error('Error updating product:', error)
 		} finally {
-			setLoading(false) // Stop loading once the request is complete
+			setLoading(false)
 		}
 	}
-
 	//  DELETE
 	const deleteProduct = async (id: number) => {
-		setLoading(true) // Start loading when deleting the product
+		setLoading(true)
 		try {
-			// Get a valid access token
 			const validAccessToken = await getValidAccessToken()
 			if (!validAccessToken) {
 				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
@@ -131,27 +123,26 @@ const Products = () => {
 		} catch (error) {
 			console.error('Error deleting product:', error)
 		} finally {
-			setLoading(false) // Stop loading once the request is complete
+			setLoading(false)
 		}
 	}
-
+	//
 	useEffect(() => {
 		if (loadingBar.current) {
-			// ref null emasligini tekshiramiz
 			if (loading) {
-				loadingBar.current.continuousStart() // Loading boshlanganda
+				loadingBar.current.continuousStart()
 			} else {
-				loadingBar.current.complete() // Loading tugaganda
+				loadingBar.current.complete()
 			}
 		}
-	}, [loading]) // Loading holatiga qarab qayta ishga tushadi
+	}, [loading])
 
 	return (
 		<div className='w-full flex flex-col h-screen overflow-y-scroll'>
 			<TopLoadingBar
 				color='#fff'
 				ref={loadingBar}
-				className='absolute top-0 left-0 w-full z-50 h-1' // Tailwind CSS class'lari
+				className='absolute top-0 left-0 w-full z-50 h-1'
 			/>
 			<Navbar username={username} />
 			<div className='max-w-7xl mx-auto w-full'>
@@ -166,7 +157,6 @@ const Products = () => {
 					/>
 				</div>
 
-				{/* Product Modal for Adding */}
 				<ProductModal
 					isOpen={isAddOpen}
 					onClose={() => setIsAddOpen(false)}
@@ -175,7 +165,6 @@ const Products = () => {
 					isEdit={false}
 				/>
 
-				{/* Product Modal for Editing */}
 				<ProductModal
 					isOpen={isEditOpen}
 					onClose={() => setIsEditOpen(false)}

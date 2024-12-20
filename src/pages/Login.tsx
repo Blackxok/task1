@@ -57,7 +57,6 @@ const Login = () => {
 		setPassword(e.target.value)
 	}
 
-	// Toggle password visibility
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword)
 	}
@@ -90,14 +89,13 @@ const Login = () => {
 						<div className='password-input flex items-center justify-center'>
 							<Input
 								id='password'
-								type={showPassword ? 'text' : 'password'} // Conditionally change the input type
+								type={showPassword ? 'text' : 'password'}
 								value={password}
 								onChange={handlePasswordChange}
 								onKeyDown={handleKeyDown}
 								className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
 								placeholder='Enter your password'
 							/>
-							{/* Eye Icon for toggling password visibility */}
 							<button
 								type='button'
 								onClick={togglePasswordVisibility}
