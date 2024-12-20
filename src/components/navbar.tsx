@@ -1,4 +1,3 @@
-// components/Navbar.tsx
 import { Link } from 'react-router-dom'
 
 const Navbar = ({ username }: { username: string }) => {
