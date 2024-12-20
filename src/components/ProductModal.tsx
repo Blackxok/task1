@@ -1,4 +1,5 @@
 import { tProduct } from '@/lib/types'
+import { getValidAccessToken } from '@/utils/tokenUtils'
 import React, { useEffect, useState } from 'react'
 
 interface ProductModalProps {
@@ -37,6 +38,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
 				created_at: product.created_at,
 				updated_at: product.updated_at,
 			})
+		} else {
+			setProductData({
+				id: 0,
+				name: '',
+				description: '',
+				price: '',
+				quantity: '',
+				created_at: '',
+				updated_at: '',
+			})
 		}
 	}, [isEdit, product])
 
@@ -48,12 +59,19 @@ const ProductModal: React.FC<ProductModalProps> = ({
 			// Update existing product if in edit mode
 			saveProduct(productData)
 		} else {
-			// Add new product via POST request
+			//  POST
+			const validAccessToken = await getValidAccessToken()
+
+			if (!validAccessToken) {
+				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
+				return
+			}
 			try {
 				const response = await fetch('https://crudproduct.pythonanywhere.com/api/products/', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
+						Authorization: `Bearer ${validAccessToken}`, // JWT tokenni Authorization headerda yuborish
 					},
 					body: JSON.stringify({
 						name: productData.name,

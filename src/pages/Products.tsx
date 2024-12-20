@@ -133,9 +133,9 @@ const Products = () => {
 		}
 	}
 
-	if (loading) {
-		return <div className='flex items-center justify-center h-screen'>Loading...</div>
-	}
+	// if (loading) {
+	// 	return <div className='flex items-center justify-center h-screen'>Loading...</div>
+	// }
 
 	return (
 		<div className='w-full flex flex-col h-screen overflow-y-scroll'>
