@@ -1,6 +1,6 @@
 import { tProduct } from '@/lib/types'
 import { getValidAccessToken } from '@/utils/tokenUtils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface ProductModalProps {
 	isOpen: boolean
@@ -17,6 +17,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
 	saveProduct,
 	isEdit,
 }) => {
+	const modalRef = useRef<HTMLDivElement>(null)
+	const [updatemodal, setUpdatemodal] = useState(true)
 	const [productData, setProductData] = useState<tProduct>({
 		id: 0,
 		name: '',
@@ -26,6 +28,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
 		created_at: '',
 		updated_at: '',
 	})
+
+	const isFormValid = () => {
+		return (
+			productData.name.trim() !== '' &&
+			productData.description.trim() !== '' &&
+			productData.price.trim() !== '' &&
+			productData.quantity.trim() !== ''
+		)
+	}
 
 	useEffect(() => {
 		if (isEdit && product) {
@@ -49,15 +60,33 @@ const ProductModal: React.FC<ProductModalProps> = ({
 				updated_at: '',
 			})
 		}
-	}, [isEdit, product])
+	}, [isEdit, product, updatemodal])
+
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+				onClose()
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [onClose])
 
 	if (!isOpen) return null
 
 	const handleSave = async () => {
+		//
+		if (!isEdit && !isFormValid()) {
+			alert(`Formda barcha maydonlar to'ldirilmagan!`)
+			return
+		}
+
 		if (isEdit) {
 			saveProduct(productData)
 		} else {
-			//  POST
+			// POST
 			const validAccessToken = await getValidAccessToken()
 
 			if (!validAccessToken) {
@@ -85,6 +114,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
 				const newProduct = await response.json()
 				saveProduct(newProduct)
+				setUpdatemodal(e => !e)
 				onClose()
 			} catch (error) {
 				console.error('Error adding product:', error)
@@ -94,9 +124,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
 	return (
 		<div className='flex items-center justify-center'>
-			<div className='fixed top-16 right-4 w-full max-w-sm p-4 bg-gray-700 text-white shadow-lg rounded-lg'>
+			<div
+				ref={modalRef}
+				className='fixed top-16 right-4 w-full max-w-sm p-4 bg-gray-700 text-white shadow-lg rounded-lg'
+			>
 				<h3 className='text-lg font-semibold'>{isEdit ? 'Edit Product' : 'Add New Product'}</h3>
-
 				<input
 					type='text'
 					value={productData.name}
@@ -104,7 +136,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
 					placeholder='Product Name'
 					className='w-full mt-2 p-2 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 				/>
-
 				<input
 					type='text'
 					value={productData.description}
@@ -112,7 +143,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
 					placeholder='Product Description'
 					className='w-full mt-2 p-2 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 				/>
-
 				<input
 					type='number'
 					value={productData.price}
@@ -120,7 +150,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
 					placeholder='Product Price'
 					className='w-full mt-2 p-2 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 				/>
-
 				<input
 					type='number'
 					value={productData.quantity}
@@ -128,7 +157,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
 					placeholder='Product Quantity'
 					className='w-full mt-2 p-2 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 				/>
-
 				<button
 					className='w-full bg-blue-600 hover:bg-blue-700 mt-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 					onClick={handleSave}
