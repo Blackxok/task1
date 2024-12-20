@@ -1,8 +1,9 @@
 import AddProductButton from '@/components/AddProductButton'
-import Navbar from '@/components/navbar'
 import ProductList from '@/components/ProductList'
 import ProductModal from '@/components/ProductModal'
+import Navbar from '@/components/navbar'
 import { tProduct } from '@/lib/types'
+import { getValidAccessToken } from '@/utils/tokenUtils'
 import { useEffect, useState } from 'react'
 
 const Products = () => {
@@ -13,21 +14,6 @@ const Products = () => {
 	const [loading, setLoading] = useState(false)
 
 	const username: string = localStorage.getItem('username') || 'Guest'
-
-	// Product GET
-	const fetchProducts = async () => {
-		setLoading(true) // Start loading when fetching data
-		try {
-			const response = await fetch('https://crudproduct.pythonanywhere.com/api/products/')
-			if (!response.ok) throw new Error('Network response was not ok')
-			const data = await response.json()
-			setProducts(data)
-		} catch (error) {
-			console.error('Error:', error)
-		} finally {
-			setLoading(false) // Stop loading once the request is complete
-		}
-	}
 
 	useEffect(() => {
 		fetchProducts()
@@ -43,16 +29,58 @@ const Products = () => {
 		setIsEditOpen(true)
 	}
 
-	// Product PUT - Update the product
+	//  GET
+	const fetchProducts = async () => {
+		setLoading(true)
+		try {
+			// Get a valid access token
+			const validAccessToken = await getValidAccessToken()
+			if (!validAccessToken) {
+				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
+				setLoading(false)
+				return
+			}
+			// Fetch so'rovini yuborish
+			const response = await fetch('https://crudproduct.pythonanywhere.com/api/products/', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${validAccessToken}`,
+				},
+			})
+			// Javobni tekshirish
+			if (!response.ok) throw new Error('Network response was not ok')
+
+			const data = await response.json()
+			setProducts(data)
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error('Error:', error.message)
+			} else {
+				console.error('Unexpected error:', error)
+			}
+		} finally {
+			setLoading(false)
+		}
+	}
+	//  PUT
 	const saveEditedProduct = async (updatedProduct: tProduct) => {
 		setLoading(true) // Start loading when saving the edited product
 		try {
+			// Get a valid access token
+			const validAccessToken = await getValidAccessToken()
+			if (!validAccessToken) {
+				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
+				setLoading(false)
+				return
+			}
 			const response = await fetch(
 				`https://crudproduct.pythonanywhere.com/api/products/${updatedProduct.id}/`,
 				{
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						Authorization: `Bearer ${validAccessToken}`,
 					},
 					body: JSON.stringify(updatedProduct),
 				},
@@ -74,12 +102,23 @@ const Products = () => {
 		}
 	}
 
-	// Product DELETE
+	//  DELETE
 	const deleteProduct = async (id: number) => {
 		setLoading(true) // Start loading when deleting the product
 		try {
+			// Get a valid access token
+			const validAccessToken = await getValidAccessToken()
+			if (!validAccessToken) {
+				console.error('JWT token mavjud emas yoki yangilashda xatolik yuz berdi!')
+				setLoading(false)
+				return
+			}
+
 			const response = await fetch(`https://crudproduct.pythonanywhere.com/api/products/${id}/`, {
 				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${validAccessToken}`,
+				},
 			})
 
 			if (!response.ok) {
@@ -94,7 +133,6 @@ const Products = () => {
 		}
 	}
 
-	// Show loading state while products are being loaded or during any other async actions
 	if (loading) {
 		return <div className='flex items-center justify-center h-screen'>Loading...</div>
 	}

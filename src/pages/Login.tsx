@@ -23,7 +23,9 @@ const Login = () => {
 				if (response.ok) {
 					const data = await response.json()
 					const accessToken = data.access
+					const refreshToken = data.refresh
 					localStorage.setItem('accessToken', accessToken)
+					localStorage.setItem('refreshToken', refreshToken)
 					localStorage.setItem('username', username)
 					navigate('/products')
 				} else {
