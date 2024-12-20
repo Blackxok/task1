@@ -1,10 +1,11 @@
 import AddProductButton from '@/components/AddProductButton'
+import Navbar from '@/components/Navbar'
 import ProductList from '@/components/ProductList'
 import ProductModal from '@/components/ProductModal'
-import Navbar from '@/components/navbar'
 import { tProduct } from '@/lib/types'
 import { getValidAccessToken } from '@/utils/tokenUtils'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import TopLoadingBar from 'react-top-loading-bar'
 
 const Products = () => {
 	const [isAddOpen, setIsAddOpen] = useState(false)
@@ -12,6 +13,7 @@ const Products = () => {
 	const [products, setProducts] = useState<tProduct[]>([])
 	const [currentProduct, setCurrentProduct] = useState<tProduct | null>(null)
 	const [loading, setLoading] = useState(false)
+	const loadingBar = useRef<any>(null)
 
 	const username: string = localStorage.getItem('username') || 'Guest'
 
@@ -133,12 +135,24 @@ const Products = () => {
 		}
 	}
 
-	// if (loading) {
-	// 	return <div className='flex items-center justify-center h-screen'>Loading...</div>
-	// }
+	useEffect(() => {
+		if (loadingBar.current) {
+			// ref null emasligini tekshiramiz
+			if (loading) {
+				loadingBar.current.continuousStart() // Loading boshlanganda
+			} else {
+				loadingBar.current.complete() // Loading tugaganda
+			}
+		}
+	}, [loading]) // Loading holatiga qarab qayta ishga tushadi
 
 	return (
 		<div className='w-full flex flex-col h-screen overflow-y-scroll'>
+			<TopLoadingBar
+				color='#fff'
+				ref={loadingBar}
+				className='absolute top-0 left-0 w-full z-50 h-1' // Tailwind CSS class'lari
+			/>
 			<Navbar username={username} />
 			<div className='max-w-7xl mx-auto w-full'>
 				<div className='w-full'>
